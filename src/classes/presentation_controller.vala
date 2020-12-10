@@ -51,6 +51,8 @@ namespace pdfpc {
                 return;
             }
 
+            eventLogger.add_slide_change(slide_number);
+
             int old_user_slide_number = this.current_user_slide_number;
 
             if (slide_number < 0 || slide_number > this.n_slides) {
@@ -167,6 +169,8 @@ namespace pdfpc {
          * Customization mode enabled?
          */
         public bool in_customization { get; protected set; default = false; }
+
+        private EventLogger eventLogger = new EventLogger();
 
         /**
          * Normalized coordinates (0 .. 1), i.e. mapped to a unity square
@@ -700,9 +704,11 @@ namespace pdfpc {
 
             switch (mode) {
                 case AnnotationMode.NORMAL:
+                    this.eventLogger.add_mode_change("normal");
                 break;
 
                 case AnnotationMode.POINTER:
+                    this.eventLogger.add_mode_change("pointer");
                     this.current_pointer = this.pointer;
                 break;
 
@@ -984,6 +990,8 @@ namespace pdfpc {
             this.device_to_normalized(event.x, event.y,
                 out pointer_x, out pointer_y);
 
+            eventLogger.add_pointer_movement(pointer_x, pointer_y);
+
             // restart the pointer timeout timer
             this.restart_pointer_timer();
             this.pointer_hidden = false;
@@ -1059,6 +1067,7 @@ namespace pdfpc {
          */
         public void quit() {
             this.metadata.quit();
+            this.eventLogger.quit();
             if (this.screensaver != null && this.screensaver_cookie != 0) {
                 try {
                     this.screensaver.un_inhibit(this.screensaver_cookie);

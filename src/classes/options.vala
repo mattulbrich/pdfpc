@@ -288,6 +288,11 @@ namespace pdfpc {
         public static string? pdfpc_location = null;
 
         /**
+         * Location of the event log file
+         */
+        public static string? event_log_file = null;
+
+        /**
          * Test pdfpc without installation
          */
         public static bool no_install = false;
